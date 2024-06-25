@@ -1,0 +1,38 @@
+{
+  "name": "Gravitalia News",
+  "short_name": "GNews",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#332b43",
+  "theme_color": "#332b43",
+  "description": "Explore the latest world news with Gravitalia!",
+  "icons": [
+    {
+      "src": "favicon.webp",
+      "sizes": "96x96",
+      "type": "image/webp"
+    },
+    {
+      "src": "/favicon.png",
+      "type": "image/png",
+      "sizes": "256x256",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Gravitalia",
+      "short_name": "Gravitalia",
+      "description": "Explore the latest world news with Gravitalia!",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/favicon.png",
+          "sizes": "256x256"
+        }
+      ]
+    }
+  ],
+  "related_applications": []
+}

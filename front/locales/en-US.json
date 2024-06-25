@@ -1,0 +1,53 @@
+{
+  "lang": {
+    "fr": "Français (FR)",
+    "us": "English (US)"
+  },
+
+  "news": "News",
+  "summary": "Summary",
+  "quiz": "Quiz",
+  "help": "Help",
+
+  "faq": {
+    "articles": {
+      "question": "Are news articles reliable?",
+      "answer": "American media selected for their diversity of opinion include: Vox, CNN, (the) New York Times, Forbes, (the) Wall Street Journal, (the) Washington Post and Fox News. Articles are assessed for journalistic quality and relevance, using keywords and social media trends, to give you an overview of the most important news. Our source code is also open and accessible at https://github.com/Gravitalia/news, so you can trust us!"
+    }
+  },
+
+  "loading": "Loading",
+
+  "day": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
+  "month": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+
+  "most_important": "The MOST important",
+  "of_the": "of {date}",
+  "read_summary": "Where would you like to read a digest of these articles?",
+
+  "error": {
+    "not_my_fault": "It's not my fault! I promise!",
+    "internal_server_error": "But the server malfunctioned..."
+  }
+}

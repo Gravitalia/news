@@ -1,0 +1,53 @@
+{
+  "lang": {
+    "fr": "Français (FR)",
+    "us": "English (US)"
+  },
+
+  "news": "Actualités",
+  "summary": "Résumé",
+  "quiz": "Quiz",
+  "help": "Aide",
+
+  "faq": {
+    "articles": {
+      "question": "Les articles d'actualité sont-ils fiables ?",
+      "answer": "Les médias français sélectionnés pour leur diversité d'opinions comprennent : L'Humanité, Libération, La Croix, Le Monde, Le Parisien, Les Echos, Ouest France, Le Point, L'Express, Marianne et Valeurs actuelles. Les articles sont évalués selon leur qualité journalistique et leur pertinence, en utilisant des mots-clés et en suivant les tendances des réseaux sociaux, afin de vous offrir une vue d'ensemble des actualités les plus importantes. Notre code source est également ouvert et accessible sur https://github.com/Gravitalia/news pour renforcer votre confiance !"
+    }
+  },
+
+  "loading": "Chargement",
+
+  "day": {
+    "monday": "lundi",
+    "tuesday": "mardi",
+    "wednesday": "mercredi",
+    "thursday": "jeudi",
+    "friday": "vendredi",
+    "saturday": "samedi",
+    "sunday": "dimanche"
+  },
+  "month": {
+    "january": "janvier",
+    "february": "février",
+    "march": "mars",
+    "april": "avril",
+    "may": "mai",
+    "june": "juin",
+    "july": "juillet",
+    "august": "août",
+    "september": "septembre",
+    "october": "octobre",
+    "november": "novembre",
+    "december": "décembre"
+  },
+
+  "most_important": "Le + important",
+  "of_the": "du {date}",
+  "read_summary": "Où voulez-vous lire un condensé de ces nouvelles ?",
+
+  "error": {
+    "not_my_fault": "C'est pas de ma faute ! Promis !",
+    "internal_server_error": "Mais le serveur dysfonctionne..."
+  }
+}

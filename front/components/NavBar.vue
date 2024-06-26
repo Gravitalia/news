@@ -10,12 +10,12 @@ const languageDropdown = ref(false);
     >
       <NuxtLink :to="localePath('/')" class="flex items-center space-x-3">
         <NuxtImg
-          src="/favicon.png"
+          src="/favicon.webp"
           format="webp"
           width="40"
           height="40"
           draggable="false"
-          alt="Gravitalia News"
+          alt="logo"
         />
         <span
           class="self-center text-xl md:text-2xl font-semibold whitespace-nowrap dark:text-white"
@@ -33,6 +33,7 @@ const languageDropdown = ref(false);
               :src="'/flags/' + locale + '.svg'"
               class="w-5 h-5 me-3"
               draggable="false"
+              alt="French flag"
             />
             {{ $t("lang." + locale) }}
           </button>
@@ -51,6 +52,7 @@ const languageDropdown = ref(false);
                       src="/flags/fr.svg"
                       class="w-5 h-5 me-3"
                       draggable="false"
+                      alt="French flag"
                     />
                     {{ $t("lang.fr") }}
                   </div>
@@ -66,6 +68,7 @@ const languageDropdown = ref(false);
                       src="/flags/us.svg"
                       class="w-5 h-5 me-3"
                       draggable="false"
+                      alt="United States flag"
                     />
                     {{ $t("lang.us") }}
                   </div>

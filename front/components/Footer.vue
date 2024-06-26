@@ -1,3 +1,7 @@
+<script setup>
+/* eslint vue/multi-word-component-names: "off", vue/valid-attribute-name: "off" */
+</script>
+
 <template>
   <footer>
     <div class="mx-auto w-full max-w-screen-xl px-4">

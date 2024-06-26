@@ -1,4 +1,6 @@
 <script setup>
+/* eslint vue/multi-word-component-names: "off", vue/valid-attribute-name: "off" */
+
 defineProps({
   question: {
     type: String,

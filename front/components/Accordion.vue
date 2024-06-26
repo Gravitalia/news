@@ -38,9 +38,8 @@ defineProps({
 
       <p
         class="py-1 text-sm text-zinc-500 dark:text-zinc-400 group-open:animate-slide-down"
-      >
-        {{ answer }}
-      </p>
+        v-html="answer"
+      ></p>
     </details>
   </div>
 </template>

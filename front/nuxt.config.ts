@@ -17,7 +17,7 @@ export default defineNuxtConfig({
           content:
             "Explore the latest world news with Gravitalia! Take advantage of summaries and interactive quizzes to stay informed and test your knowledge.",
         },
-        { name: "theme-color", content: "#8b5cf6" },
+        { name: "theme-color", content: "#000000" },
         { name: "robots", content: "index, follow" },
         { name: "twitter:card", content: "summary" },
         { name: "twitter:site", content: "@gravitaliaoss" },

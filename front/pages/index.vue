@@ -45,23 +45,30 @@ const { loading, result, error } = useQuery(query, {});
 </script>
 
 <template>
-  <div class="mx-auto max-w-screen-xl px-4 py-16">
+  <div class="mx-auto max-w-screen-xl px-4 py-2 md:py-16">
+    <!-- Server error. -->
+    <Banner
+      v-if="error"
+      :content="$t('error.internal_server_error')"
+      :can-close="true"
+    />
+
     <Accordion
       :question="$t('faq.articles.question')"
       :answer="$t('faq.articles.answer')"
     />
 
     <div
-      class="my-6 w-full h-full bg-zinc-50 dark:bg-dark border dark:border-zinc-900 rounded-lg shadow-lg px-16 py-8"
+      class="my-6 w-full h-full bg-zinc-50 dark:bg-dark border dark:border-zinc-900 rounded-lg shadow-lg px-6 py-5 md:px-20 md:py-8"
     >
-      <h2 class="text-2xl font-semibold flex">
+      <h2 class="text-lg md:text-2xl font-semibold flex">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-7 mr-2 mt-1"
+          class="size-5 md:size-7 mr-2 mt-1.5 md:mt-1"
         >
           <path
             stroke-linecap="round"
@@ -70,13 +77,13 @@ const { loading, result, error } = useQuery(query, {});
           />
         </svg>
         {{ $t("most_important") }}
-        <span class="mt-1 ml-2 text-xl font-thin">{{
+        <span class="mt-1.5 md:mt-1 ml-2 text-sm md:text-xl font-thin">{{
           $t("of_the", { date: getFormattedDate() })
         }}</span>
       </h2>
       <NuxtLink
         :to="localePath('/summary')"
-        class="mt-1 flex hover:underline text-sm text-zinc-500 dark:text-zinc-400 w-1/3"
+        class="mt-1 flex hover:underline text-sm text-zinc-500 dark:text-zinc-400 md:w-1/2"
         >{{ $t("read_summary") }}
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -92,15 +99,17 @@ const { loading, result, error } = useQuery(query, {});
             d="m8.25 4.5 7.5 7.5-7.5 7.5"
           ></path></svg
       ></NuxtLink>
-      <div v-if="error" class="mt-6 flex flex-col items-center">
+      <!--<div v-if="error" class="mt-6 flex flex-col items-center">
         <NuxtImg src="/error.svg" width="600" draggable="false" />
-        <p class="mt-6 text-xl">{{ $t("error.not_my_fault") }}</p>
+        <p class="mt-6 text-md md:text-xl">{{ $t("error.not_my_fault") }}</p>
         <p class="mt-2 text-md">{{ $t("error.internal_server_error") }}</p>
-      </div>
-      <div v-else class="mt-6 grid gap-x-28 gap-y-12 grid-cols-3">
-        <CardTopNews :loading="loading" :article="result" />
-        <CardTopNews :loading="loading" :article="result" />
-        <CardTopNews :loading="loading" :article="result" />
+      </div> -->
+      <div
+        class="mt-6 px-2 md:px-6 lg:px-8 xl:px-0 grid gap-x-4 gap-y-12 md:gap-x-6 lg:gap-x-24 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      >
+        <CardTopNews :loading="loading || error" :article="result" />
+        <CardTopNews :loading="loading || error" :article="result" />
+        <CardTopNews :loading="loading || error" :article="result" />
       </div>
     </div>
   </div>

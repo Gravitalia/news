@@ -42,12 +42,13 @@
     "december": "December"
   },
 
-  "most_important": "The MOST important",
+  "most_important": "MOST important",
   "of_the": "of {date}",
-  "read_summary": "Where would you like to read a digest of these articles?",
+  "read_summary": "Or just read a digest of these articles?",
 
+  "warning": "Warning",
   "error": {
     "not_my_fault": "It's not my fault! I promise!",
-    "internal_server_error": "But the server malfunctioned..."
+    "internal_server_error": "We couldn't get the latest news... come back in a few hours (I hope!)"
   }
 }

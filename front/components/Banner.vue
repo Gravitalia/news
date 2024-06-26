@@ -15,13 +15,13 @@ const isClosed = ref(false);
 <template>
   <div
     v-if="!isClosed"
-    class="fixed top-0 left-0 right-0 z-50 flex gap-x-6 bg-violet-700 py-2 px-6 sm:px-3.5 sm:before:flex-1"
+    class="flex justify-center gap-x-6 bg-violet-700 py-3 px-6 sm:px-3.5"
   >
-    <div class="xl:ml-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-      <p class="hidden xl:block text-white font-semibold text-sm leading-6">
+    <div class="flex flex-wrap items-center gap-x-4">
+      <p class="hidden xl:block text-white font-semibold text-sm">
         {{ $t("warning") }}
       </p>
-      <p class="text-sm leading-6 text-zinc-200">
+      <p class="text-sm text-zinc-200">
         {{ content }}
       </p>
     </div>

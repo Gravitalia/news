@@ -12,7 +12,7 @@
   "faq": {
     "articles": {
       "question": "Are news articles reliable?",
-      "answer": "American media selected for their diversity of opinion include: Vox, CNN, (the) New York Times, Forbes, (the) Wall Street Journal, (the) Washington Post and Fox News. Articles are assessed for journalistic quality and relevance, using keywords and social media trends, to give you an overview of the most important news. Our source code is also open and accessible at https://github.com/Gravitalia/news, so you can trust us!"
+      "answer": "American media selected for their diversity of opinion include: Vox, CNN, (the) New York Times, Forbes, (the) Wall Street Journal, (the) Washington Post and Fox News. Articles are assessed for journalistic quality and relevance, using keywords and social media trends, to give you an overview of the most important news. Our source code is also open and accessible at {link}, so you can trust us!"
     }
   },
 

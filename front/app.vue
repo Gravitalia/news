@@ -1,7 +1,21 @@
+<script setup lang="ts">
+const error = ref(false);
+function callback() {
+  error.value = true;
+}
+</script>
+
 <template>
-  <NuxtLayout class="dark:bg-zinc-900 dark:text-white">
+  <NuxtLayout>
+    <!-- Server error. -->
+    <Banner
+      v-if="error"
+      :content="$t('error.internal_server_error')"
+      :can-close="false"
+    />
+
     <NavBar />
-    <NuxtPage />
+    <NuxtPage @show-error="callback" />
     <Footer />
   </NuxtLayout>
 </template>

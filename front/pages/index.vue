@@ -1,5 +1,6 @@
 <script setup>
 const { t } = useI18n();
+const emit = defineEmits(["showError"]);
 
 function getFormattedDate() {
   const days = [
@@ -42,20 +43,22 @@ const query = gql`
   }
 `;
 const { loading, result, error } = useQuery(query, {});
+
+// If GraphQL API is not working, throw an error to the user.
+if (error) {
+  emit("showError");
+}
 </script>
 
 <template>
   <div class="mx-auto max-w-screen-xl px-4 py-2 md:py-16">
-    <!-- Server error. -->
-    <Banner
-      v-if="error"
-      :content="$t('error.internal_server_error')"
-      :can-close="true"
-    />
-
     <Accordion
       :question="$t('faq.articles.question')"
-      :answer="$t('faq.articles.answer')"
+      :answer="
+        $t('faq.articles.answer', {
+          link: '<a href=\'https://github.com/Gravitalia/news\' class=\'text-blue-600 hover:text-blue-800\'>GitHub</a>',
+        })
+      "
     />
 
     <div

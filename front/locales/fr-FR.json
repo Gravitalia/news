@@ -44,10 +44,11 @@
 
   "most_important": "Le + important",
   "of_the": "du {date}",
-  "read_summary": "Où voulez-vous lire un condensé de ces nouvelles ?",
+  "read_summary": "Ou lire un condensé de ces nouvelles ?",
 
+  "warning": "Avertissement",
   "error": {
     "not_my_fault": "C'est pas de ma faute ! Promis !",
-    "internal_server_error": "Mais le serveur dysfonctionne..."
+    "internal_server_error": "Nous n'avons pas pu obtenir les dernières actualités... revenez dans quelques heures (j'espère !)"
   }
 }

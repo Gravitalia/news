@@ -18,12 +18,12 @@ const languageDropdown = ref(false);
           alt="Gravitalia News"
         />
         <span
-          class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white"
+          class="self-center text-xl md:text-2xl font-semibold whitespace-nowrap dark:text-white"
           >Gravitalia <span class="font-thin">News</span></span
         >
       </NuxtLink>
-      <div class="flex order-2 rtl:space-x-reverse">
-        <div class="flex items-center order-2">
+      <div class="flex order-2">
+        <div class="flex items-center order-2 md:order-none">
           <button
             type="button"
             class="inline-flex items-center font-medium justify-center px-4 py-2 text-sm text-zinc-800 dark:text-zinc-200 rounded-lg cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-700 dark:hover:text-white"
@@ -75,7 +75,9 @@ const languageDropdown = ref(false);
           </div>
         </div>
       </div>
-      <div class="flex gap-8">
+      <div
+        class="py-4 md:py-0 border-b md:border-none flex gap-8 order-3 md:order-1"
+      >
         <NuxtLink
           :to="localePath('/')"
           class="group transition duration-100 font-semibold flex-1 text-center px-2"

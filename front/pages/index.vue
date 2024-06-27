@@ -62,7 +62,7 @@ if (error) {
     />
 
     <div
-      class="my-6 w-full h-full bg-zinc-50 dark:bg-dark border dark:border-zinc-900 rounded-lg shadow-lg px-6 py-5 md:px-20 md:py-8"
+      class="my-6 w-full h-full bg-zinc-50 dark:bg-zinc-800 border dark:border-zinc-900 rounded-lg shadow-lg px-6 py-5 md:px-20 md:py-8"
     >
       <h2 class="text-lg md:text-2xl font-semibold flex">
         <svg

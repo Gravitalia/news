@@ -9,11 +9,22 @@ const languageDropdown = ref(false);
       class="mx-auto max-w-screen-xl flex flex-wrap items-center justify-between p-4"
     >
       <NuxtLink :to="localePath('/')" class="flex items-center space-x-3">
+        <!-- Logos. -->
         <NuxtImg
           src="/favicon.webp"
           format="webp"
           width="40"
           height="40"
+          draggable="false"
+          class="block dark:hidden"
+          alt="logo"
+        />
+        <NuxtImg
+          src="/favicon-white.webp"
+          format="webp"
+          width="40"
+          height="40"
+          class="hidden dark:block"
           draggable="false"
           alt="logo"
         />

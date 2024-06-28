@@ -50,5 +50,8 @@
   "error": {
     "not_my_fault": "It's not my fault! I promise!",
     "internal_server_error": "We couldn't get the latest news... come back in a few hours (I hope!)"
-  }
+  },
+
+  "read_more_articles": "Read more articles on this subject?",
+  "take_quiz": "Take the news quiz"
 }

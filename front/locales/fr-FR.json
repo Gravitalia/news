@@ -49,6 +49,9 @@
   "warning": "Avertissement",
   "error": {
     "not_my_fault": "C'est pas de ma faute ! Promis !",
-    "internal_server_error": "Nous n'avons pas pu obtenir les dernières actualités... revenez dans quelques heures (j'espère !)"
-  }
+    "internal_server_error": "Mon coach n'a pas écrit de phrase d'erreur, alors : une erreur s'est produite durant l'obtention des données."
+  },
+
+  "read_more_articles": "Lire plus d'articles à ce sujet ?",
+  "take_quiz": "Passer le quiz sur l'actualité"
 }

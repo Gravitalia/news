@@ -1,5 +1,5 @@
 <script setup>
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const emit = defineEmits(["showError"]);
 
 function getFormattedDate() {
@@ -32,17 +32,26 @@ function getFormattedDate() {
 }
 
 const query = gql`
-  query TopNews {
-    news {
-      url
-      media
+  query GetNews($country: String!, $limit: Int!) {
+    news(country: $country, limit: $limit) {
       title
-      image
-      date
+      description
+      publishedAt
+      image {
+        host
+        path
+      }
+      source {
+        name
+        url
+      }
     }
   }
 `;
-const { loading, result, error } = useQuery(query, {});
+const { loading, result, error } = useQuery(query, {
+  country: locale,
+  limit: 3,
+});
 
 // If GraphQL API is not working, throw an error to the user.
 if (error) {
@@ -100,8 +109,9 @@ if (error) {
             stroke-linecap="round"
             stroke-linejoin="round"
             d="m8.25 4.5 7.5 7.5-7.5 7.5"
-          ></path></svg
-      ></NuxtLink>
+          ></path>
+        </svg>
+      </NuxtLink>
       <!--<div v-if="error" class="mt-6 flex flex-col items-center">
         <NuxtImg src="/error.svg" width="600" draggable="false" />
         <p class="mt-6 text-md md:text-xl">{{ $t("error.not_my_fault") }}</p>

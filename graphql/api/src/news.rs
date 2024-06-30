@@ -1,5 +1,5 @@
-use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
 use crate::models::{image::Image, news::News, source::Media};
+use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
 
 /// Define the context for your GraphQL schema.
 #[derive(Clone)]
@@ -17,32 +17,35 @@ impl News {
         &self.description
     }
 
-    fn publishedAt(&self) -> i32 {
+    fn published_at(&self) -> i32 {
         self.published_at
     }
 
-    /*fn image(&self) -> Image {
+    fn image(&self) -> &Image {
         &self.image
     }
 
-    fn source(&self) -> Media {
+    fn source(&self) -> &Media {
         &self.source
-    }*/
+    }
 
-    fn similar(&self) -> Vec<News> {
-        self.similar
+    fn similar(&self) -> &Vec<News> {
+        &self.similar
     }
 }
 
-/// Define the root query object
+/// Define the root query object.
 #[derive(Clone, Copy, Debug)]
 pub struct Query;
 
-/// Implement the GraphQL object for the root query
+/// Implement the GraphQL object for the root query.
 #[graphql_object(context = Context)]
 impl Query {
     /// Define an asynchronous method to retrieve a user by vanity
-    async fn get_news(context: &Context, country: String) -> News {
+    async fn get_news(context: &Context, country: String, limit: i32) -> Vec<News> {
+        vec![News {
+            ..Default::default()
+        }]
     }
 }
 

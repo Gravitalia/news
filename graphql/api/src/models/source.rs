@@ -1,7 +1,8 @@
 use crate::models::image::Image;
+use juniper::GraphQLObject;
 
 /// A structure representing where the article has been taken.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default, GraphQLObject)]
 pub struct Media {
     pub name: String,
     pub url: String,

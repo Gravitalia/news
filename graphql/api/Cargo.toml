@@ -8,6 +8,8 @@ warp = "0.3"
 juniper = "0.16"
 tokio = { version = "1.38", features = ["macros", "rt-multi-thread"] }
 juniper_warp = "0.8"
-serde = "1"
+serde = { version = "1", features = ["derive"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
+crawler = { path = "../crawler" }
+search = { path = "../search" }

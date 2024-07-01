@@ -39,7 +39,7 @@ async fn main() {
                 ))),
     )
     .run((
-        [127, 0, 0, 1],
+        [0, 0, 0, 0],
         std::env::var("PORT")
             .unwrap_or_else(|_| DEFAULT_PORT.to_string())
             .parse()

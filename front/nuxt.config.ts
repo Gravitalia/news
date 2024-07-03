@@ -80,6 +80,7 @@ export default defineNuxtConfig({
       {
         defaultLocale: "us",
         strategy: "prefix",
+        customRoutes: "config",
         lazy: true,
         langDir: "locales",
         detectBrowserLanguage: {
@@ -103,7 +104,14 @@ export default defineNuxtConfig({
             name: "Français",
           },
         ],
-        baseUrl: "https://www.gravitalia.com",
+        pages: {
+          // Implement this later due to [`localePath`] limitations.
+          /*mth: {
+            en: "/mth",
+            fr: "/qcm",
+          }*/
+        },
+        baseUrl: "https://news.gravitalia.com",
       },
     ],
     "@nuxtjs/tailwindcss",

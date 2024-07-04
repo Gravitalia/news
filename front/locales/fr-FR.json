@@ -13,6 +13,10 @@
     "articles": {
       "question": "Les articles d'actualité sont-ils fiables ?",
       "answer": "Les médias français sélectionnés pour leur diversité d'opinions comprennent : L'Humanité, Libération, La Croix, Le Monde, Le Parisien, Les Echos, Ouest France, Le Point, L'Express, Marianne et Valeurs actuelles. Les articles sont évalués selon leur qualité journalistique et leur pertinence, en utilisant des mots-clés et en suivant les tendances des réseaux sociaux, afin de vous offrir une vue d'ensemble des actualités les plus importantes. Notre code source est également ouvert et accessible sur {link} pour renforcer votre confiance !"
+    },
+    "no_response": {
+      "question": "Que faire si je n'ai pas la réponse ?",
+      "answer": "Tentez ! Les réponses ne sont ni enregistrées ni analysées, alors faites preuve d'imagination. 🤫"
     }
   },
 

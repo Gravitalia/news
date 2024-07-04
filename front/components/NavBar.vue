@@ -111,7 +111,7 @@ const languageDropdown = ref(false);
           ></span>
         </NuxtLink>
         <NuxtLink
-          :to="localePath('/mth')"
+          :to="localePath('/mcq')"
           class="group transition duration-100 font-semibold flex-1 text-center px-2"
         >
           {{ $t("quiz") }}

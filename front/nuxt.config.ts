@@ -120,6 +120,12 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  runtimeConfig: {
+    public: {
+      APP_NAME: process.env.APP_NAME,
+    },
+  },
+
   nitro: {
     preset: "cloudflare_pages",
   },

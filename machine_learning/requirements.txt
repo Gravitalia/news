@@ -1,0 +1,2 @@
+fastapi
+tensorflow>2.16

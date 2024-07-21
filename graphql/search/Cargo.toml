@@ -3,6 +3,10 @@ name = "search"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+chrono = "0.4"
+error = { path = "../error" }
+meilisearch-sdk = "0.26"
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1.38", features = ["rt-multi-thread"] }
+tracing = "0.1"

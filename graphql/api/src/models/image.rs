@@ -1,6 +1,7 @@
 use juniper::{GraphQLEnum, GraphQLObject};
+use serde::{Serialize, Deserialize};
 
-#[derive(Clone, Debug, Default, GraphQLEnum)]
+#[derive(Clone, Debug, Default, GraphQLEnum, Serialize, Deserialize)]
 pub enum Scheme {
     #[default]
     Http,
@@ -8,7 +9,7 @@ pub enum Scheme {
 }
 
 /// A structure representing an image.
-#[derive(Clone, Debug, Default, GraphQLObject)]
+#[derive(Clone, Debug, Default, GraphQLObject, Serialize, Deserialize)]
 pub struct Image {
     pub host: String,
     pub path: String,

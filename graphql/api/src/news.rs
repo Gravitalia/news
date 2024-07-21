@@ -25,12 +25,16 @@ impl News {
         &self.image
     }
 
+    fn similar(&self) -> &Vec<News> {
+        &self.similar
+    }
+
     fn source(&self) -> &Media {
         &self.source
     }
 
-    fn similar(&self) -> &Vec<News> {
-        &self.similar
+    fn summary(&self) -> &String {
+        &self.summary
     }
 }
 
@@ -42,7 +46,11 @@ pub struct Query;
 #[graphql_object(context = Context)]
 impl Query {
     /// Define an asynchronous method to retrieve a user by vanity
-    async fn get_news(context: &Context, country: String, limit: i32) -> Vec<News> {
+    async fn get_news(
+        context: &Context,
+        country: String,
+        limit: i32,
+    ) -> Vec<News> {
         vec![News {
             ..Default::default()
         }]
@@ -50,7 +58,12 @@ impl Query {
 }
 
 /// Define the schema using RootNode
-type Schema = RootNode<'static, Query, EmptyMutation<Context>, EmptySubscription<Context>>;
+type Schema = RootNode<
+    'static,
+    Query,
+    EmptyMutation<Context>,
+    EmptySubscription<Context>,
+>;
 
 /// Create the schema instance
 pub fn schema() -> Schema {

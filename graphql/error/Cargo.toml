@@ -1,0 +1,8 @@
+[package]
+name = "error"
+version.workspace = true
+description.workspace = true
+homepage.workspace = true
+readme.workspace = true
+edition.workspace = true
+license.workspace = true

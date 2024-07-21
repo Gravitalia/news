@@ -1,6 +1,6 @@
 use crate::models::image::Image;
 use crate::models::source::Media;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// A structure representing a news article.
 #[derive(Clone, Debug, Default, Serialize, Deserialize)]
@@ -11,6 +11,7 @@ pub struct News {
     pub(crate) content: String,
     pub published_at: i32,
     pub image: Image,
-    pub source: Media,
     pub similar: Vec<News>,
+    pub source: Media,
+    pub summary: String,
 }

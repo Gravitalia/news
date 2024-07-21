@@ -10,6 +10,7 @@ COPY ../graphql/Cargo.toml ./Cargo.toml
 COPY ../graphql/Cargo.lock ./Cargo.lock
 COPY ../graphql/api ./api
 COPY ../graphql/crawler ./crawler
+COPY ../graphql/error ./error
 COPY ../graphql/search ./search
 
 RUN cargo build --release

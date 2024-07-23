@@ -4,8 +4,9 @@
 
 mod media;
 mod models;
-mod news;
+mod schema;
 
+use crate::schema::*;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
 use warp::Filter;
 
@@ -21,8 +22,8 @@ async fn main() {
     tracing_subscriber::registry().with(fmt_layer).init();
 
     // Create a filter for the main GraphQL endpoint.
-    let context = warp::any().map(move || news::Context {});
-    let graphql_filter = juniper_warp::make_graphql_filter(news::schema(), context);
+    let context = warp::any().map(move || Context {});
+    let graphql_filter = juniper_warp::make_graphql_filter(schema(), context);
 
     warp::serve(
         warp::any()
@@ -31,12 +32,12 @@ async fn main() {
             .or(warp::post()
                 .and(warp::path("graphql").and(graphql_filter))
                 .with(warp::log("warp_server")))
-            .or(warp::get()
-                .and(warp::path("graphiql"))
-                .and(juniper_warp::graphiql_filter(
+            .or(warp::get().and(warp::path("graphiql")).and(
+                juniper_warp::graphiql_filter(
                     "/graphql",
                     Some("/subscriptions"),
-                ))),
+                ),
+            )),
     )
     .run((
         [0, 0, 0, 0],

@@ -1,12 +1,11 @@
-use juniper::GraphQLObject;
-use serde::{Deserialize, Serialize};
 use crate::models::news::News;
+use serde::{Deserialize, Serialize};
 
 /// A structure representing a question of a multiple-choice question (MCQ).
-#[derive(Clone, Debug, Default, GraphQLObject, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Serialize, Deserialize)]
 pub struct Question {
-    question: String,
-    choices: Vec<String>,
-    answer: String,
-    article: News,
+    pub question: String,
+    pub choices: Vec<String>,
+    pub answer: String,
+    pub article: News,
 }

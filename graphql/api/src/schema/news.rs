@@ -1,10 +1,6 @@
 use crate::models::{image::Image, news::News, source::Media};
-use juniper::{graphql_object, EmptyMutation, EmptySubscription, RootNode};
-
-/// Define the context for your GraphQL schema.
-#[derive(Clone)]
-pub struct Context {}
-impl juniper::Context for Context {}
+use crate::Context;
+use juniper::graphql_object;
 
 /// Implement GraphQL on News structure.
 #[graphql_object(context = Context, description = "A media article.")]
@@ -38,38 +34,23 @@ impl News {
     }
 }
 
-/// Define the root query object.
+/// Define the news query object.
 #[derive(Clone, Copy, Debug)]
-pub struct Query;
+pub struct NewsQuery;
 
-/// Implement the GraphQL object for the root query.
+/// Implement the GraphQL object for the news query.
 #[graphql_object(context = Context)]
-impl Query {
-    /// Define an asynchronous method to retrieve a user by vanity
+impl NewsQuery {
+    /// Get the most relevant news of the day.
     async fn get_news(
-        context: &Context,
-        country: String,
-        limit: i32,
+        _ctx: &Context,
+        #[graphql(description = "ISO 3166-1 alpha-2 country code.")]
+        _country: String,
+        #[graphql(description = "Maximum number of articles sent.")]
+        _limit: i32,
     ) -> Vec<News> {
         vec![News {
             ..Default::default()
         }]
     }
-}
-
-/// Define the schema using RootNode
-type Schema = RootNode<
-    'static,
-    Query,
-    EmptyMutation<Context>,
-    EmptySubscription<Context>,
->;
-
-/// Create the schema instance
-pub fn schema() -> Schema {
-    Schema::new(
-        Query,
-        EmptyMutation::<Context>::new(),
-        EmptySubscription::<Context>::new(),
-    )
 }

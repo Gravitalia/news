@@ -5,30 +5,37 @@ use juniper::graphql_object;
 /// Implement GraphQL on News structure.
 #[graphql_object(context = Context, description = "A media article.")]
 impl News {
+    /// News article title.
     fn title(&self) -> &str {
         &self.title
     }
 
+    /// Description of the article written by its authors.
     fn description(&self) -> &str {
         &self.description
     }
 
+    /// Article publication date with `dd/mm/yyyy` format.
     fn published_at(&self) -> i32 {
         self.published_at
     }
 
+    /// The image chosen by the editorial team to illustrate the subject.
     fn image(&self) -> &Image {
         &self.image
     }
 
+    /// Similar articles.
     fn similar(&self) -> &Vec<News> {
         &self.similar
     }
 
+    /// The media that published the article.
     fn source(&self) -> &Media {
         &self.source
     }
 
+    /// ML-generated summary of news article.
     fn summary(&self) -> &String {
         &self.summary
     }

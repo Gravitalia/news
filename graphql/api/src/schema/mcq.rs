@@ -5,18 +5,22 @@ use juniper::graphql_object;
 /// Implement GraphQL on Question structure.
 #[graphql_object(context = Context, description = "A question, its choices and answers.")]
 impl Question {
+    /// The question about current news.
     fn question(&self) -> &str {
         &self.question
     }
 
+    /// Choices related to the question: 2 false, 1 true.
     fn choices(&self) -> &Vec<String> {
         &self.choices
     }
 
+    /// The true answer.
     fn answer(&self) -> &str {
         &self.answer
     }
 
+    /// Additional data related to the news article.
     fn article(&self) -> &News {
         &self.article
     }

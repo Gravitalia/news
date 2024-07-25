@@ -31,7 +31,7 @@ if (error) {
 </script>
 
 <template>
-  <div class="mx-auto max-w-screen-xl px-4 py-16">
+  <div class="flex flex-col items-center mx-auto max-w-screen-xl px-4 py-16">
     <CardSummary v-if="loading || error" :loading="true" :numero="1" />
     <CardSummary
       v-for="(news, index) in result"
@@ -43,9 +43,9 @@ if (error) {
       learn_more="<a href=\'https://github.com/Gravitalia/news\' class=\'text-blue-600 hover:text-blue-800\'>Le Monde</a>, <a href=\'https://github.com/Gravitalia/news\' class=\'text-blue-600 hover:text-blue-800\'>Le Figaro</a>"
     />
 
-    <div class="w-56">
+    <div class="mr-auto">
       <NuxtLink
-        to="/mth"
+        :to="localePath('/mcq')"
         class="group transition duration-100 font-semibold flex-1 text-center px-2"
       >
         <div class="flex">

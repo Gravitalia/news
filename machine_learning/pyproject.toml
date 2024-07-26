@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "news_ml"
+version = "0.1.0"
+description = "HTTP API to host the ML algorithms used in Gravitalia News."
+readme = "README.md"
+license = { file = "LICENSE" }
+dependencies = [
+    "fastapi",
+    "sentencepiece==0.2.0",
+    "tensorflow>2.16",
+    "tf-keras>=2.17",
+    "transformers>4.43",
+    "torch>=2.4.0",
+    "unidecode==1.3.8",
+]
+
+[project.optional-dependencies]
+dev = [
+    "black",
+]
+
+[project.urls]
+homepage = "https://news.gravitalia.com"
+repository = "https://github.com/Gravitalia/news"
+
+[tool.black]
+line-length = 80
+target-version = ["py39"]

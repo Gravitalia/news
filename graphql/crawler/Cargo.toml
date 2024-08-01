@@ -5,7 +5,10 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4"
+polymath-crawler = { git = "https://github.com/Lubmminy/polymath" }
+polymath-error = { git = "https://github.com/Lubmminy/polymath" }
 reqwest = "0.12"
 rss = "2.*"
 tokio = { version = "1.38", features = ["rt-multi-thread"] }
 tracing = "0.1"
+scraper = "0.19"

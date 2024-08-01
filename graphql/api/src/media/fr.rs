@@ -1,6 +1,10 @@
 //! France (FR) medias.
 
-enum French {
+use crawler::scraper::Extractor;
+use strum_macros::EnumIter;
+
+#[derive(Debug, EnumIter)]
+pub enum French {
     LHumanité,
     Libération,
     LaCroix,
@@ -15,7 +19,7 @@ enum French {
 }
 
 impl French {
-    fn name(&self) -> &'static str {
+    pub fn _name(&self) -> &'static str {
         match self {
             French::LHumanité => "L'Humanité",
             French::Libération => "Libération",
@@ -31,7 +35,7 @@ impl French {
         }
     }
 
-    fn url(&self) -> &'static str {
+    pub fn url(&self) -> &'static str {
         match self {
             French::LHumanité => "https://www.humanite.fr",
             French::Libération => "https://www.liberation.fr",
@@ -47,7 +51,7 @@ impl French {
         }
     }
 
-    fn rss(&self) -> Option<&'static str> {
+    pub fn rss(&self) -> Option<&'static str> {
         match self {
             French::LHumanité => None,
             French::Libération => {
@@ -62,6 +66,55 @@ impl French {
             French::LExpress => None,
             French::Marianne => Some("https://www.marianne.net/rss.xml"),
             French::ValeursActuelles => Some("https://www.valeursactuelles.com/feed"), // Reader looks broken on Chrome.
+        }
+    }
+
+    pub fn extractor(&self) -> Extractor {
+        match self {
+            French::LHumanité => Extractor {
+                class: Some("rich-text".to_owned()),
+                id: None,
+            },
+            French::Libération => Extractor {
+                class: Some("article-body-wrapper".to_owned()),
+                id: None,
+            },
+            French::LaCroix => Extractor {
+                class: Some("content".to_owned()), // `article-content-wrapper` should also work.
+                id: None,
+            },
+            French::LeMonde => Extractor {
+                class: Some("article__content".to_owned()),
+                id: None,
+            },
+            French::LeParisien => Extractor {
+                class: Some("article-section".to_owned()),
+                id: None,
+            },
+            French::LesEchos => Extractor {
+                class: Some("post-paywall".to_owned()), // `post-paywall` seems to be the unchanged class; however we have `kbgxbh`.
+                id: None,
+            },
+            French::OuestFrance => Extractor {
+                class: None, // `contenu-principal` may work.
+                id: Some("article-detail".to_owned()),
+            },
+            French::LePoint => Extractor {
+                class: None, // `article-styles` may work.
+                id: Some("contenu".to_owned()),
+            },
+            French::LExpress => Extractor {
+                class: Some("qiota_reserve".to_owned()),
+                id: None,
+            },
+            French::Marianne => Extractor {
+                class: Some("article__content".to_owned()), // `article__wrapper` should also work.
+                id: None,
+            },
+            French::ValeursActuelles => Extractor {
+                class: Some("post__content".to_owned()),
+                id: None,
+            },
         }
     }
 }

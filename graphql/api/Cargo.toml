@@ -13,3 +13,6 @@ tracing = "0.1"
 tracing-subscriber = "0.3"
 crawler = { path = "../crawler" }
 search = { path = "../search" }
+strum = "0.26"
+strum_macros = "0.26"
+url = "2.*"

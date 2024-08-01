@@ -7,7 +7,12 @@ mod models;
 mod schema;
 
 use crate::schema::*;
+use crawler::Crawler;
+use std::time::Duration;
+use strum::IntoEnumIterator;
+use tracing::debug;
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use url::Url;
 use warp::Filter;
 
 const DEFAULT_PORT: u16 = 5400;
@@ -20,6 +25,41 @@ async fn main() {
         .with_thread_ids(true);
 
     tracing_subscriber::registry().with(fmt_layer).init();
+
+    let mut feeds = Vec::new();
+    let mut crawler = Crawler::new(Duration::from_secs(300)); // 5 minutes.
+
+    // Add method to extract from French medias.
+    for variant in media::fr::French::iter() {
+        // Add RSS feed on feeds content.
+        if let Some(rss) = variant.rss() {
+            feeds.push(rss.to_owned());
+        }
+
+        // Help crawler (scraper) finding article content by adding class or id attribute of article content.
+        if let Ok(host) = Url::parse(variant.url())
+            .map_err(|e| format!("Invalid URL: {}", e))
+            .and_then(|url| {
+                url.host_str()
+                    .map(|host| host.to_owned())
+                    .ok_or_else(|| "No host found in URL".to_owned())
+            })
+        {
+            debug!(
+                "Add {:?} method extractor for {}",
+                variant.extractor(),
+                host
+            );
+            crawler
+                .extraction
+                .write()
+                .await
+                .insert(host, variant.extractor());
+        }
+    }
+
+    crawler.feeds(feeds);
+    crawler.crawl().unwrap();
 
     // Create a filter for the main GraphQL endpoint.
     let context = warp::any().map(move || Context {});

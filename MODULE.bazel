@@ -1,0 +1,38 @@
+"""poios - news aggregator"""
+
+module(
+    name = "poios",
+    version = "1.0",
+)
+
+bazel_dep(name = "platforms", version = "0.0.8")
+bazel_dep(name = "bazel_skylib", version = "1.5.0")
+
+# Rust support.
+bazel_dep(name = "rules_rust", version = "0.48.0")
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(edition = "2021")
+use_repo(
+    rust,
+    "rust_toolchains",
+)
+
+register_toolchains("@rust_toolchains//:all")
+
+crate = use_extension(
+    "@rules_rust//crate_universe:extension.bzl",
+    "crate",
+)
+crate.from_cargo(
+    name = "crate_index",
+    cargo_lockfile = "//graphql:Cargo.lock",
+    manifests = [
+        "//graphql:Cargo.toml",
+        "//graphql/api:Cargo.toml",
+        "//graphql/crawler:Cargo.toml",
+        "//graphql/error:Cargo.toml",
+        "//graphql/search:Cargo.toml",
+    ],
+)
+use_repo(crate, "crate_index")

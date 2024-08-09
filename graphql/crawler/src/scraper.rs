@@ -1,77 +1,110 @@
 //! polymath based web scraper.
 
-use polymath_crawler::extractor::meta::Meta;
-use polymath_crawler::Event;
 use scraper::{Html, Selector};
 use std::collections::HashMap;
 use std::{fmt::Debug, sync::Arc};
 use tokio::sync::RwLock;
 
-/// Custom event manager.
-#[derive(Debug)]
-pub struct News;
-
-impl Event for News {
-    fn before_request(&self, _: &str) -> Result<(), polymath_error::Error> {
-        Ok(())
-    }
-
-    fn after_request(
-        &self,
-        _title: &str,
-        _: Vec<Meta>,
-        _html: &str,
-    ) -> Result<(), polymath_error::Error> {
-        // Process or analyze the HTML content here.
-        // You can also save result on a database.
-        Ok(())
-    }
+/// Attribute to extract content from HTML content.
+#[derive(Debug, Default)]
+pub struct Attribute {
+    /// Extraction by [class](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class) attribute.
+    pub class: Option<String>,
+    /// Extraction by [id](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) attribute.
+    pub id: Option<String>,
 }
 
 /// Attribute to extract content from HTML content.
 #[derive(Debug, Default)]
-pub struct Extractor {
-    /// Content extraction by [class](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/class) attribute.
-    pub class: Option<String>,
-    /// Content extraction by [id](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/id) attribute.
-    pub id: Option<String>,
+pub struct Extract {
+    /// Extract article content.
+    pub content: Attribute,
+    /// Extract article image.
+    /// Do not bypass RSS-provided image.
+    pub image: Attribute,
 }
 
-/// Extract the written content of the article.
-pub async fn extract_article_content(
-    extraction: Arc<RwLock<HashMap<String, Extractor>>>,
-    url: &str,
-    html_content: &str,
-) -> String {
-    if let Some(what_to_extract) = extraction.read().await.get(url) {
-        let document = Html::parse_document(html_content);
+/// Extract elements from selected attributes on HTML.
+pub struct Extractor {
+    extraction: Arc<RwLock<HashMap<String, Extract>>>,
+    url: String,
+    html: String,
+}
 
-        let text = if let Some(class) = &what_to_extract.class {
-            if let Ok(selector) = Selector::parse(&format!(".{}", class)) {
-                document
-                    .select(&selector)
-                    .flat_map(|e| e.text())
-                    .collect::<Vec<_>>()
-                    .concat()
+impl Extractor {
+    /// Create a new [`Extractor`].
+    pub fn new(
+        extraction: Arc<RwLock<HashMap<String, Extract>>>,
+        url: &str,
+        html_content: &str,
+    ) -> Self {
+        Extractor {
+            extraction,
+            url: url.to_owned(),
+            html: html_content.to_owned(),
+        }
+    }
+
+    /// Extract the written content of the article.
+    pub async fn extract_content(&self) -> String {
+        if let Some(what_to_extract) =
+            self.extraction.read().await.get(&self.url)
+        {
+            let document = Html::parse_document(&self.html);
+
+            let text = if let Some(class) = &what_to_extract.content.class {
+                match Selector::parse(&format!(".{}", class)) {
+                    Ok(selector) => document
+                        .select(&selector)
+                        .flat_map(|e| e.text())
+                        .collect::<Vec<_>>()
+                        .concat(),
+                    Err(_) => String::default(),
+                }
+            } else if let Some(id) = &what_to_extract.content.id {
+                if let Ok(selector) = Selector::parse(&format!("#{}", id)) {
+                    document
+                        .select(&selector)
+                        .next()
+                        .map(|e| e.text().collect::<Vec<_>>().concat())
+                        .unwrap_or_default()
+                } else {
+                    String::default()
+                }
             } else {
                 String::default()
-            }
-        } else if let Some(id) = &what_to_extract.id {
-            if let Ok(selector) = Selector::parse(&format!("#{}", id)) {
-                document
-                    .select(&selector)
-                    .next()
-                    .map(|e| e.text().collect::<Vec<_>>().concat())
-                    .unwrap_or_default()
-            } else {
-                String::default()
-            }
+            };
+
+            text
         } else {
             String::default()
-        };
+        }
+    }
 
-        text
-    } else {
-        String::default()
+    /// Extract the image URL of the article.
+    pub async fn extract_image(&self) -> Option<String> {
+        if let Some(what_to_extract) =
+            self.extraction.read().await.get(&self.url)
+        {
+            let document = Html::parse_document(&self.html);
+
+            if let Some(class) = &what_to_extract.image.class {
+                match Selector::parse(&format!("img[class*={:?}]", class)) {
+                    Ok(selector) => {
+                        document.select(&selector).next().and_then(|element| {
+                            element
+                                .value()
+                                .attr("src")
+                                .map(|src| src.to_string())
+                        })
+                    },
+                    Err(_) => None,
+                }
+            } else {
+                None
+            }
+        } else {
+            None
+        }
     }
 }

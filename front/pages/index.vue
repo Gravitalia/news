@@ -32,18 +32,22 @@ function getFormattedDate() {
 }
 
 const query = gql`
-  query GetNews($country: String!, $limit: Int!) {
-    news(country: $country, limit: $limit) {
-      title
-      description
-      publishedAt
-      image {
-        host
-        path
-      }
-      source {
-        name
-        url
+  {
+    news {
+      query GetNews($country: String!, $limit: Int!) {
+        getNews(country: $country, limit: $limit) {
+          title
+          description
+          publishedAt
+          image {
+            host
+            path
+          }
+          source {
+            name
+            url
+          }
+        }
       }
     }
   }

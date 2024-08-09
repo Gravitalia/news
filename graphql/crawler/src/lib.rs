@@ -9,18 +9,20 @@ use chrono::{DateTime, FixedOffset};
 use polymath_crawler::Crawler as Polymath;
 use reqwest::Client;
 use rss::Channel;
-use scraper::Extractor;
+use scraper::{Extract, Extractor};
 use std::{
     collections::HashMap, convert::Infallible, sync::Arc, time::Duration,
 };
 use tokio::{
     sync::{mpsc::Sender, Mutex, RwLock},
     task::spawn,
-    time::interval,
+    time::{interval, sleep},
 };
 use tracing::{debug, error, info};
+use url::Url;
 
 /// Represents a news article in an RSS feed.
+#[derive(Debug)]
 pub struct RssNews {
     /// Author written text.
     pub content: String,
@@ -47,7 +49,7 @@ pub struct Crawler {
     feeds: Vec<String>,
     channel: Option<Sender<RssNews>>,
     /// Helps the scraper obtain the written content of the article.
-    pub extraction: Arc<RwLock<HashMap<String, Extractor>>>,
+    pub extraction: Arc<RwLock<HashMap<String, Extract>>>,
 }
 
 impl Crawler {
@@ -107,6 +109,9 @@ impl Crawler {
                             Ok(content) => {
                                 match Channel::read_from(&content[..]) {
                                     Ok(channel) => {
+                                        let articles_count =
+                                            Arc::new(RwLock::new(0u64));
+
                                         for item in channel.items() {
                                             let mut news = RssNews {
                                                 content: String::default(),
@@ -122,17 +127,55 @@ impl Crawler {
                                                 image: item.enclosure.as_ref().map(|enclosure| enclosure.url.clone()),
                                             };
 
-                                            match crawler
+                                            let crawler = Arc::clone(&crawler);
+                                            let extraction =
+                                                Arc::clone(&extraction);
+                                            let articles_count =
+                                                Arc::clone(&articles_count);
+
+                                            spawn(async move {
+                                                {
+                                                    let mut count =
+                                                        articles_count
+                                                            .write()
+                                                            .await;
+                                                    *count += 1;
+                                                }
+
+                                                sleep(Duration::from_secs(
+                                                    *articles_count
+                                                        .read()
+                                                        .await
+                                                        * 10,
+                                                ))
+                                                .await;
+
+                                                if let Ok(host) = Url::parse(&news.url)
+                                                .map_err(|e| format!("Invalid URL: {}", e))
+                                                .and_then(|url| {
+                                                    url.host_str()
+                                                        .map(|host| host.to_owned())
+                                                        .ok_or_else(|| "No host found in URL".to_owned())
+                                                })
+                                            {
+                                                match crawler
                                                 .lock()
                                                 .await
                                                 .just_fetch(
                                                     news.url.clone(), false, false,
                                                 ) {
                                                     Ok(html) => {
-                                                        news.content = scraper::extract_article_content(Arc::clone(&extraction), url, &html).await;
+                                                        let extractor = Extractor::new(Arc::clone(&extraction), &host, &html);
+                                                        news.content = extractor.extract_content().await;
+                                                        if news.image.is_none() {
+                                                            news.image = extractor.extract_image().await;
+                                                        }
+                                                        println!("{:?}", news);
                                                     },
                                                     Err(err) => error!("Cannot get article content of {} ({}): {}", news.title, news.url, err),
                                                 }
+                                            }
+                                            });
                                         }
                                     },
                                     Err(e) => {

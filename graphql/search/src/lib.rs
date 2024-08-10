@@ -17,7 +17,7 @@ pub trait Attributes {
 }
 
 /// Meilisearch instance manager.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Search {
     client: Client,
     index: String,

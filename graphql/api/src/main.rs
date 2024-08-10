@@ -11,7 +11,10 @@ use crawler::Crawler;
 use std::time::Duration;
 use strum::IntoEnumIterator;
 use tracing::debug;
-use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use search::Search;
+use std::sync::Arc;
+use tracing::Level;
+use tracing_subscriber::fmt;
 use url::Url;
 use warp::Filter;
 
@@ -19,12 +22,12 @@ const DEFAULT_PORT: u16 = 5400;
 
 #[tokio::main]
 async fn main() {
-    let fmt_layer = fmt::layer()
+    fmt()
         .with_file(true)
         .with_line_number(true)
-        .with_thread_ids(true);
-
-    tracing_subscriber::registry().with(fmt_layer).init();
+        .with_thread_ids(true)
+        .with_max_level(Level::INFO)
+        .init();
 
     let mut feeds = Vec::new();
     let mut crawler = Crawler::new(Duration::from_secs(300)); // 5 minutes.
@@ -46,7 +49,7 @@ async fn main() {
             })
         {
             debug!(
-                "Add {:?} method extractor for {}",
+                "Add {:?} method extractor for {}.",
                 variant.extractor(),
                 host
             );
@@ -61,8 +64,19 @@ async fn main() {
     crawler.feeds(feeds);
     crawler.crawl().unwrap();
 
+    // Create meilisearch client.
+    let searcher = Arc::new(
+        Search::new(
+            std::env::var("MEILISEARCH_URL").unwrap_or("localhost:7700".into()),
+            std::env::var("MEILISEARCH_URL").ok(),
+        )
+        .unwrap(),
+    );
+
     // Create a filter for the main GraphQL endpoint.
-    let context = warp::any().map(move || Context {});
+    let context = warp::any().map(move || Context {
+        meilisearch: Arc::clone(&searcher),
+    });
     let graphql_filter = juniper_warp::make_graphql_filter(schema(), context);
 
     warp::serve(

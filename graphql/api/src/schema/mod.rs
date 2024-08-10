@@ -4,10 +4,14 @@ mod news;
 use juniper::{EmptyMutation, EmptySubscription, RootNode};
 use mcq::QuestionQuery;
 use news::NewsQuery;
+use search::Search;
+use std::sync::Arc;
 
 /// Define the context for the GraphQL schema.
-#[derive(Clone)]
-pub struct Context {}
+#[derive(Clone, Debug)]
+pub struct Context {
+    pub meilisearch: Arc<Search>,
+}
 impl juniper::Context for Context {}
 
 /// Define the root query object.

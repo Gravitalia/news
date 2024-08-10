@@ -16,3 +16,4 @@ search = { path = "../search" }
 strum = "0.26"
 strum_macros = "0.26"
 url = "2.*"
+r2d2-memcache = "0.6"

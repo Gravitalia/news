@@ -7,18 +7,19 @@ mod models;
 mod schema;
 
 use crate::schema::*;
-use crawler::Crawler;
-use std::time::Duration;
-use strum::IntoEnumIterator;
-use tracing::debug;
+use crawler::{cache::Cache, Crawler};
 use search::Search;
 use std::sync::Arc;
+use std::time::Duration;
+use strum::IntoEnumIterator;
 use tracing::Level;
+use tracing::{debug, info};
 use tracing_subscriber::fmt;
 use url::Url;
 use warp::Filter;
 
 const DEFAULT_PORT: u16 = 5400;
+const LRU_CAPACITY: usize = 100;
 
 #[tokio::main]
 async fn main() {
@@ -29,8 +30,20 @@ async fn main() {
         .with_max_level(Level::INFO)
         .init();
 
+    let cache = if let Ok(url) = std::env::var("MEMCACHED_URL") {
+        let manager = r2d2_memcache::MemcacheConnectionManager::new(url);
+        let pool = r2d2_memcache::r2d2::Pool::builder()
+            .max_size(15)
+            .build(manager)
+            .unwrap();
+        info!("Created a Memcached pool.");
+        Cache::new(LRU_CAPACITY).memcached(pool)
+    } else {
+        Cache::new(LRU_CAPACITY)
+    };
+
     let mut feeds = Vec::new();
-    let mut crawler = Crawler::new(Duration::from_secs(300)); // 5 minutes.
+    let mut crawler = Crawler::new(Duration::from_secs(300)).cache(cache); // 5 minutes.
 
     // Add method to extract from French medias.
     for variant in media::fr::French::iter() {

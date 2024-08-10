@@ -3,9 +3,12 @@
 //! Fetches news from RSS feeds provided by various media outlets.
 //! It then uses a [Polymath](https://github.com/Lubmminy/Polymath) extension (crawler) to retrieve the full news content.
 
+pub mod cache;
 pub mod scraper;
 
+use cache::Cache;
 use chrono::{DateTime, FixedOffset};
+use futures::future::join_all;
 use polymath_crawler::Crawler as Polymath;
 use reqwest::Client;
 use rss::Channel;
@@ -18,7 +21,7 @@ use tokio::{
     task::spawn,
     time::{interval, sleep},
 };
-use tracing::{debug, error, info};
+use tracing::{error, info};
 use url::Url;
 
 /// Represents a news article in an RSS feed.
@@ -42,6 +45,7 @@ pub struct RssNews {
 
 /// Crawl manager.
 pub struct Crawler {
+    cache: Arc<RwLock<cache::Cache>>,
     client: Client,
     crawler: Arc<Mutex<Polymath>>,
     delay: Duration,
@@ -65,6 +69,7 @@ impl Crawler {
         );
 
         Crawler {
+            cache: Arc::new(RwLock::new(Cache::new(100))),
             client: Client::new(),
             crawler: Arc::new(Mutex::new(crawler)),
             delay,
@@ -73,6 +78,12 @@ impl Crawler {
             channel: None,
             extraction: Arc::new(RwLock::new(HashMap::new())),
         }
+    }
+
+    /// Set custom [Cache] policy.
+    pub fn cache(mut self, cache: Cache) -> Self {
+        self.cache = Arc::new(RwLock::new(cache));
+        self
     }
 
     /// Sets the list of RSS feeds to be crawled.
@@ -90,29 +101,33 @@ impl Crawler {
     /// Starts the crawling process using the provided RSS feeds
     /// and retrieves the full content of each news article.
     pub fn crawl(&self) -> Result<(), Infallible> {
-        let client = self.client.clone();
-        let mut interval = interval(self.delay);
+        let interval = interval(self.delay);
         let feeds = self.feeds.clone();
+        let client = self.client.clone();
         let crawler = Arc::clone(&self.crawler);
         let extraction = Arc::clone(&self.extraction);
+        let cache = Arc::clone(&self.cache);
 
         spawn(async move {
+            let mut interval = interval;
             loop {
                 interval.tick().await;
                 info!("RSS feed reading...");
 
-                for url in &feeds {
-                    debug!("Getting {} feed.", url);
+                let fetches = feeds.iter().map(|url| {
+                    let client = client.clone();
+                    let crawler = Arc::clone(&crawler);
+                    let extraction = Arc::clone(&extraction);
+                    let cache = Arc::clone(&cache);
 
-                    if let Ok(req) = client.get(url).send().await {
-                        match req.bytes().await {
-                            Ok(content) => {
-                                match Channel::read_from(&content[..]) {
+                    async move {
+                        match client.get(url).send().await {
+                            Ok(req) => match req.bytes().await {
+                                Ok(content) => match Channel::read_from(&content[..]) {
                                     Ok(channel) => {
-                                        let articles_count =
-                                            Arc::new(RwLock::new(0u64));
+                                        let articles_count = Arc::new(RwLock::new(0u64));
 
-                                        for item in channel.items() {
+                                        let tasks = channel.items().iter().map(|item| {
                                             let mut news = RssNews {
                                                 content: String::default(),
                                                 title: item.title.as_deref().unwrap_or_default().to_owned(),
@@ -128,72 +143,60 @@ impl Crawler {
                                             };
 
                                             let crawler = Arc::clone(&crawler);
-                                            let extraction =
-                                                Arc::clone(&extraction);
-                                            let articles_count =
-                                                Arc::clone(&articles_count);
+                                            let extraction = Arc::clone(&extraction);
+                                            let cache = Arc::clone(&cache);
+                                            let articles_count = Arc::clone(&articles_count);
 
-                                            spawn(async move {
+                                            async move {
                                                 {
-                                                    let mut count =
-                                                        articles_count
-                                                            .write()
-                                                            .await;
+                                                    let mut count = articles_count.write().await;
                                                     *count += 1;
                                                 }
 
-                                                sleep(Duration::from_secs(
-                                                    *articles_count
-                                                        .read()
-                                                        .await
-                                                        * 10,
-                                                ))
-                                                .await;
+                                                sleep(Duration::from_secs(*articles_count.read().await * 10)).await;
 
-                                                if let Ok(host) = Url::parse(&news.url)
-                                                .map_err(|e| format!("Invalid URL: {}", e))
-                                                .and_then(|url| {
-                                                    url.host_str()
-                                                        .map(|host| host.to_owned())
-                                                        .ok_or_else(|| "No host found in URL".to_owned())
-                                                })
-                                            {
-                                                match crawler
-                                                .lock()
-                                                .await
-                                                .just_fetch(
-                                                    news.url.clone(), false, false,
-                                                ) {
-                                                    Ok(html) => {
-                                                        let extractor = Extractor::new(Arc::clone(&extraction), &host, &html);
-                                                        news.content = extractor.extract_content().await;
-                                                        if news.image.is_none() {
-                                                            news.image = extractor.extract_image().await;
+                                                if let Ok(url) = Url::parse(&news.url) {
+                                                    let host = match url.host_str() {
+                                                        Some(host) => host.to_owned(),
+                                                        None => {
+                                                            error!("Invalid URL without host: {}", news.url);
+                                                            return;
                                                         }
-                                                        println!("{:?}", news);
-                                                    },
-                                                    Err(err) => error!("Cannot get article content of {} ({}): {}", news.title, news.url, err),
+                                                    };
+
+                                                    let is_cached = cache.write().await.get(url.clone()).unwrap_or(false);
+
+                                                    if !is_cached {
+                                                        cache.write().await.set(url.clone()).unwrap();
+
+                                                        match crawler.lock().await.just_fetch(news.url.clone(), false, false) {
+                                                            Ok(html) => {
+                                                                let extractor = Extractor::new(Arc::clone(&extraction), &host, &html);
+                                                                news.content = extractor.extract_content().await;
+                                                                if news.image.is_none() {
+                                                                    news.image = extractor.extract_image().await;
+                                                                }
+                                                                println!("{:?}", news);
+                                                            }
+                                                            Err(err) => error!("Failed to fetch article content for {}: {}", news.url, err),
+                                                        }
+                                                    }
                                                 }
                                             }
-                                            });
-                                        }
-                                    },
-                                    Err(e) => {
-                                        error!("Failed to parse channel from {} feed: {:?}", url, e);
-                                    },
-                                }
+                                        });
+
+                                        join_all(tasks).await;
+                                    }
+                                    Err(e) => error!("Failed to parse channel from feed {}: {:?}", url, e),
+                                },
+                                Err(e) => error!("Failed to read content from feed {}: {:?}", url, e),
                             },
-                            Err(e) => {
-                                error!(
-                                    "Failed to get content from {} feed: {:?}",
-                                    url, e
-                                );
-                            },
+                            Err(e) => error!("Failed to send request to feed {}: {:?}", url, e),
                         }
-                    } else {
-                        error!("Failed to send request to {} feed.", url);
                     }
-                }
+                });
+
+                join_all(fetches).await;
             }
         });
 

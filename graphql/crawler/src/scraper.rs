@@ -88,20 +88,26 @@ impl Extractor {
         {
             let document = Html::parse_document(&self.html);
 
-            if let Some(class) = &what_to_extract.image.class {
-                match Selector::parse(&format!("img[class*={:?}]", class)) {
-                    Ok(selector) => {
-                        document.select(&selector).next().and_then(|element| {
-                            element
-                                .value()
-                                .attr("src")
-                                .map(|src| src.to_string())
-                        })
-                    },
-                    Err(_) => None,
-                }
+            let class = what_to_extract.image.class.as_ref()?;
+
+            // Create the CSS selector.
+            let selector =
+                Selector::parse(&format!("img[class*=\"{}\"]", class)).ok()?;
+            let src =
+                document.select(&selector).next().and_then(|element| {
+                    element.value().attr("src").map(String::from)
+                })?;
+
+            if src.starts_with('/') {
+                let base_url = url::Url::parse(&self.url).ok()?;
+                Some(format!(
+                    "{}://{}{}",
+                    base_url.scheme(),
+                    base_url.host_str()?,
+                    src
+                ))
             } else {
-                None
+                Some(src)
             }
         } else {
             None

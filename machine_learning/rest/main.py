@@ -17,8 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-tokenizer = AutoTokenizer.from_pretrained("google/pegasus-large")
-model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-large")
+tokenizer = AutoTokenizer.from_pretrained("google/pegasus-xsum")
+model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-xsum")
 
 
 # Handle prefetch request.

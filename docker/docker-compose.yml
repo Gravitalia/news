@@ -10,6 +10,17 @@ services:
     ports:
       - 5400:5400
 
+  machine_learning:
+    build:
+      context: ../
+      dockerfile: ./docker/ml/Dockerfile
+    container_name: machine_learning
+    restart: always
+    environment:
+      - PORT=8000
+    ports:
+      - 8000:8000
+
   squid:
     image: ghcr.io/gravitalia/squid:1.0.0
     platform: linux/amd64

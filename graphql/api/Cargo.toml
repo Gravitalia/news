@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 warp = "0.3"
-juniper = "0.16"
+juniper = { version = "0.16", features = ["chrono"] }
 tokio = { version = "1.38", features = ["macros", "rt-multi-thread"] }
 juniper_warp = "0.8"
 serde = { version = "1", features = ["derive"] }
@@ -17,3 +17,6 @@ strum = "0.26"
 strum_macros = "0.26"
 url = "2.*"
 r2d2-memcache = "0.6"
+reqwest = { version = "0.12", features = ["json"] }
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.10", features = ["v4", "fast-rng"] }

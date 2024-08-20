@@ -2,18 +2,19 @@
 #![deny(dead_code, unused_imports, unused_mut, missing_docs)]
 //! GraphQL API.
 
+mod helpers;
 mod media;
 mod models;
 mod schema;
 
+use crate::models::news::News;
 use crate::schema::*;
 use crawler::{cache::Cache, Crawler};
-use search::Search;
-use std::sync::Arc;
-use std::time::Duration;
+use search::{Attributes, Search};
+use std::{sync::Arc, time::Duration};
 use strum::IntoEnumIterator;
-use tracing::Level;
-use tracing::{debug, info};
+use tokio::sync::mpsc;
+use tracing::{debug, error, info, Level};
 use tracing_subscriber::fmt;
 use url::Url;
 use warp::Filter;
@@ -21,8 +22,14 @@ use warp::Filter;
 const DEFAULT_PORT: u16 = 5400;
 const LRU_CAPACITY: usize = 100;
 
+impl Attributes for News {
+    fn primary_key(&self) -> Option<&str> {
+        Some("id")
+    }
+}
+
 #[tokio::main]
-async fn main() {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     fmt()
         .with_file(true)
         .with_line_number(true)
@@ -34,8 +41,7 @@ async fn main() {
         let manager = r2d2_memcache::MemcacheConnectionManager::new(url);
         let pool = r2d2_memcache::r2d2::Pool::builder()
             .max_size(15)
-            .build(manager)
-            .unwrap();
+            .build(manager)?;
         info!("Created a Memcached pool.");
         Cache::new(LRU_CAPACITY).memcached(pool)
     } else {
@@ -75,22 +81,42 @@ async fn main() {
     }
 
     crawler.feeds(feeds);
-    crawler.crawl().unwrap();
+
+    // Create MPSC channel.
+    let (tx, mut rx) = mpsc::channel(100);
+    crawler.channel(tx);
+
+    // Start crawling medias.
+    crawler.crawl()?;
 
     // Create meilisearch client.
     let searcher = Arc::new(
         Search::new(
-            std::env::var("MEILISEARCH_URL").unwrap_or("localhost:7700".into()),
+            std::env::var("MEILISEARCH_URL")
+                .unwrap_or("http://localhost:7700".into()),
             std::env::var("MEILISEARCH_URL").ok(),
-        )
-        .unwrap(),
+        )?
+        .index("news".into())
+        .await,
     );
 
     // Create a filter for the main GraphQL endpoint.
+    let ctx_searcher = Arc::clone(&searcher);
     let context = warp::any().map(move || Context {
-        meilisearch: Arc::clone(&searcher),
+        meilisearch: Arc::clone(&ctx_searcher),
     });
     let graphql_filter = juniper_warp::make_graphql_filter(schema(), context);
+
+    // Create receiver of crawled articles.
+    tokio::spawn(async move {
+        while let Some(i) = rx.recv().await {
+            if let Err(e) =
+                crate::helpers::handler::process_article(i, &searcher).await
+            {
+                error!("Failed to process article: {}", e);
+            }
+        }
+    });
 
     warp::serve(
         warp::any()
@@ -110,8 +136,9 @@ async fn main() {
         [0, 0, 0, 0],
         std::env::var("PORT")
             .unwrap_or_else(|_| DEFAULT_PORT.to_string())
-            .parse()
-            .unwrap(),
+            .parse()?,
     ))
-    .await
+    .await;
+
+    Ok(())
 }

@@ -107,6 +107,7 @@ impl Crawler {
         let crawler = Arc::clone(&self.crawler);
         let extraction = Arc::clone(&self.extraction);
         let cache = Arc::clone(&self.cache);
+        let channel = self.channel.clone();
 
         spawn(async move {
             let mut interval = interval;
@@ -119,6 +120,7 @@ impl Crawler {
                     let crawler = Arc::clone(&crawler);
                     let extraction = Arc::clone(&extraction);
                     let cache = Arc::clone(&cache);
+                    let tokio_channel = channel.clone();
 
                     async move {
                         match client.get(url).send().await {
@@ -146,6 +148,7 @@ impl Crawler {
                                             let extraction = Arc::clone(&extraction);
                                             let cache = Arc::clone(&cache);
                                             let articles_count = Arc::clone(&articles_count);
+                                            let tokio_channel = tokio_channel.clone();
 
                                             async move {
                                                 {
@@ -176,7 +179,10 @@ impl Crawler {
                                                                 if news.image.is_none() {
                                                                     news.image = extractor.extract_image().await;
                                                                 }
-                                                                println!("{:?}", news);
+
+                                                                if let Some(channel) = tokio_channel {
+                                                                    channel.send(news).await.unwrap();
+                                                                }
                                                             }
                                                             Err(err) => error!("Failed to fetch article content for {}: {}", news.url, err),
                                                         }

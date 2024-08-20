@@ -1,11 +1,14 @@
 mod mcq;
 mod news;
 
+use chrono::{DateTime, Utc};
 use juniper::{EmptyMutation, EmptySubscription, RootNode};
 use mcq::QuestionQuery;
 use news::NewsQuery;
 use search::Search;
 use std::sync::Arc;
+
+pub type Date = DateTime<Utc>;
 
 /// Define the context for the GraphQL schema.
 #[derive(Clone, Debug)]

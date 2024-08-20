@@ -1,6 +1,7 @@
 //! France (FR) medias.
 
 use crawler::scraper::{Attribute, Extract};
+use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 #[derive(Debug, EnumIter)]
@@ -18,7 +19,7 @@ pub enum French {
 }
 
 impl French {
-    pub fn _name(&self) -> &'static str {
+    pub fn name(&self) -> &'static str {
         match self {
             French::LHumanité => "L'Humanité",
             French::Libération => "Libération",
@@ -168,5 +169,9 @@ impl French {
                 },
             },
         }
+    }
+
+    pub fn from_url(url: &str) -> Option<French> {
+        French::iter().find(|media| url.starts_with(media.url()))
     }
 }

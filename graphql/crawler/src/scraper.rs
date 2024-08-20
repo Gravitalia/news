@@ -98,12 +98,8 @@ impl Extractor {
                     element.value().attr("src").map(String::from)
                 })?;
 
-            if src.starts_with("/") {
-                Some(format!(
-                    "https://{}{}",
-                    self.url,
-                    src
-                ))
+            if src.starts_with('/') {
+                Some(format!("https://{}{}", self.url, src))
             } else {
                 Some(src)
             }

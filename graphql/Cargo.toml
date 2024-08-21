@@ -4,6 +4,7 @@ members = [
     "api",
     "crawler",
     "error",
+    "rank",
     "search",
 ]
 

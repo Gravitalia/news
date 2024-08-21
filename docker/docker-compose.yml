@@ -21,6 +21,19 @@ services:
     ports:
       - 8000:8000
 
+  meilisearch:
+    container_name: meilisearch
+    image: getmeili/meilisearch
+    restart: unless-stopped
+    environment:
+      - MEILI_MASTER_KEY=
+      - MEILI_NO_ANALYTICS=true
+      - MEILI_DB_PATH=/data.ms
+    ports:
+      - 7700:7700
+    volumes:
+      - ./data.ms:/data.ms
+
   squid:
     image: ghcr.io/gravitalia/squid:1.0.0
     platform: linux/amd64
@@ -30,3 +43,13 @@ services:
       - 50051:50051
     volumes:
       - ./squid.yml:/config.yaml
+
+  memcached:
+    image: memcached:alpine
+    container_name: memcached
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    ports:
+      - 11211:11211

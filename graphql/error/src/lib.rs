@@ -26,7 +26,7 @@ use std::error::Error as StdError;
 use std::fmt;
 
 /// Boxed error to bypass specific [Error](StdError).
-type BError = Box<dyn StdError + Send + Sync>;
+pub type BError = Box<dyn StdError + Send + Sync>;
 
 /// Represents an error in Polymath.
 #[derive(Debug)]
@@ -91,6 +91,8 @@ impl StdError for ErrorType {}
 pub enum Database {
     /// Meilisearch index has not been selected.
     MissingIndex,
+    /// Failed to get pool.
+    Pool,
 }
 
 impl fmt::Display for Database {
@@ -98,6 +100,9 @@ impl fmt::Display for Database {
         match self {
             Database::MissingIndex => {
                 write!(f, "Index has not been selected.")
+            },
+            Database::Pool => {
+                write!(f, "Failed to get pool.")
             },
         }
     }

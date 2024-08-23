@@ -81,6 +81,35 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    // Add method to extract from US medias.
+    for variant in media::us::UnitedStates::iter() {
+        // Add RSS feed on feeds content.
+        if let Some(rss) = variant.rss() {
+            feeds.push(rss.to_owned());
+        }
+
+        // Help crawler (scraper) finding article content by adding class or id attribute of article content.
+        if let Ok(host) = Url::parse(variant.url())
+            .map_err(|e| format!("Invalid URL: {}", e))
+            .and_then(|url| {
+                url.host_str()
+                    .map(|host| host.to_owned())
+                    .ok_or_else(|| "No host found in URL".to_owned())
+            })
+        {
+            debug!(
+                "Add {:?} method extractor for {}.",
+                variant.extractor(),
+                host
+            );
+            crawler
+                .extraction
+                .write()
+                .await
+                .insert(host, variant.extractor());
+        }
+    }
+
     crawler.feeds(feeds);
 
     // Create MPSC channel.

@@ -1,6 +1,7 @@
 mod mcq;
 mod news;
 
+use crate::helpers::ranking::Ranker;
 use chrono::{DateTime, Utc};
 use juniper::{EmptyMutation, EmptySubscription, RootNode};
 use mcq::QuestionQuery;
@@ -13,7 +14,10 @@ pub type Date = DateTime<Utc>;
 /// Define the context for the GraphQL schema.
 #[derive(Clone, Debug)]
 pub struct Context {
+    /// [`search::Search`] meilisearch client.
     pub meilisearch: Arc<Search>,
+    /// Custom [`Ranker`] supporting multiple sources.
+    pub ranker: Ranker,
 }
 impl juniper::Context for Context {}
 

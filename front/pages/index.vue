@@ -32,21 +32,18 @@ function getFormattedDate() {
 }
 
 const query = gql`
-  {
+  query getNews($country: String!, $limit: Int!) {
     news {
-      query GetNews($country: String!, $limit: Int!) {
-        getNews(country: $country, limit: $limit) {
-          title
-          description
-          publishedAt
-          image {
-            host
-            path
-          }
-          source {
-            name
-            url
-          }
+      getNews(country: $country, limit: $limit) {
+        title
+        description
+        publishedAt
+        image {
+          fullUrl
+        }
+        source {
+          url
+          name
         }
       }
     }
@@ -124,9 +121,16 @@ if (error) {
       <div
         class="mt-6 px-2 md:px-6 lg:px-8 xl:px-0 grid gap-x-4 gap-y-12 md:gap-x-6 lg:gap-x-24 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
       >
-        <CardTopNews :loading="loading || error" :article="result" />
-        <CardTopNews :loading="loading || error" :article="result" />
-        <CardTopNews :loading="loading || error" :article="result" />
+        <CardTopNews
+          v-for="news in result?.news?.getNews || Array(3).fill({})"
+          :key="news"
+          :loading="loading || error"
+          :title="news?.title"
+          :url="news?.source?.url"
+          :image="news?.image?.fullUrl"
+          :media="news?.source?.name"
+          :date="news?.publishedAt"
+        />
       </div>
     </div>
   </div>

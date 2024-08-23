@@ -2,18 +2,23 @@
 const { locale } = useI18n();
 const emit = defineEmits(["showError"]);
 const query = gql`
-  query GetNews($country: String!, $limit: Int!) {
-    news(country: $country, limit: $limit) {
-      title
-      summary
-      source {
-        name
-        url
-      }
-      similar {
+  query getNews($country: String!, $limit: Int!) {
+    news {
+      getNews(country: $country, limit: $limit) {
+        title
+        summary
+        image {
+          fullUrl
+        }
         source {
-          name
           url
+          name
+        }
+        similar {
+          source {
+            url
+            name
+          }
         }
       }
     }
@@ -34,13 +39,13 @@ if (error) {
   <div class="flex flex-col items-center mx-auto max-w-screen-xl px-4 py-16">
     <CardSummary v-if="loading || error" :loading="true" :numero="1" />
     <CardSummary
-      v-for="(news, index) in result"
+      v-for="(news, index) in result.news.getNews"
       v-else
       v-bind:key="news"
       :numero="index + 1"
-      title="Législatives anticipées"
-      content="Les élections législatives anticipées sont un mécanisme permettant de renouveler l'assemblée législative avant la fin de son mandat normal. Ce processus intervient dans diverses circonstances et est souvent lié à des crises politiques ou à des situations d'impasse institutionnelle. Voici un résumé détaillé de ce que sont les élections législatives anticipées, leurs causes, leurs conséquences et quelques exemples historiques."
-      learn_more="<a href=\'https://github.com/Gravitalia/news\' class=\'text-blue-600 hover:text-blue-800\'>Le Monde</a>, <a href=\'https://github.com/Gravitalia/news\' class=\'text-blue-600 hover:text-blue-800\'>Le Figaro</a>"
+      :title="news.title"
+      :content="news.summary"
+      :learn_more="`<a href='${news.source.url}' class='text-blue-600 hover:text-blue-800'>${news.source.name}</a>`"
     />
 
     <div class="mr-auto">

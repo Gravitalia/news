@@ -1,3 +1,4 @@
+use crate::helpers::ranking::Ranker;
 use crate::helpers::summary;
 use crate::media::fr::French;
 use crate::models::{
@@ -15,6 +16,7 @@ use url::Url;
 pub async fn process_article(
     article: RssNews,
     searcher: &Arc<Search>,
+    ranker: &mut Ranker,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let summary = summary::get_summary(&article.content).await?;
 
@@ -61,8 +63,10 @@ pub async fn process_article(
             summary,
         };
 
+        ranker.add_entry(&news.title).await?;
+
         searcher.add_entry(news).await.map_err(|e| e.into())
     } else {
-        Err("dd".into())
+        Err("No media found with this URL".into())
     }
 }

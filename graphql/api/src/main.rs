@@ -10,6 +10,7 @@ mod schema;
 use crate::models::news::News;
 use crate::schema::*;
 use crawler::{cache::Cache, Crawler};
+use helpers::ranking::Ranker;
 use search::{Attributes, Search};
 use std::{sync::Arc, time::Duration};
 use strum::IntoEnumIterator;
@@ -100,18 +101,27 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await,
     );
 
+    // Create ranking platform.
+    let ranker = Ranker::new().await?;
+
     // Create a filter for the main GraphQL endpoint.
+    let ctx_ranker = ranker.clone();
     let ctx_searcher = Arc::clone(&searcher);
     let context = warp::any().map(move || Context {
         meilisearch: Arc::clone(&ctx_searcher),
+        ranker: ctx_ranker.clone(),
     });
     let graphql_filter = juniper_warp::make_graphql_filter(schema(), context);
 
     // Create receiver of crawled articles.
     tokio::spawn(async move {
         while let Some(i) = rx.recv().await {
-            if let Err(e) =
-                crate::helpers::handler::process_article(i, &searcher).await
+            if let Err(e) = crate::helpers::handler::process_article(
+                i,
+                &searcher,
+                &mut ranker.clone(),
+            )
+            .await
             {
                 error!("Failed to process article: {}", e);
             }

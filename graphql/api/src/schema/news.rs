@@ -1,6 +1,7 @@
 use crate::models::{image::Image, news::News, source::Media};
+use crate::schema::Date;
 use crate::Context;
-use juniper::graphql_object;
+use juniper::{graphql_object, FieldResult};
 
 /// Implement GraphQL on News structure.
 #[graphql_object(context = Context, description = "A media article.")]
@@ -16,7 +17,7 @@ impl News {
     }
 
     /// Article publication date with `dd/mm/yyyy` format.
-    fn published_at(&self) -> i32 {
+    fn published_at(&self) -> Date {
         self.published_at
     }
 
@@ -50,14 +51,16 @@ pub struct NewsQuery;
 impl NewsQuery {
     /// Get the most relevant news of the day.
     async fn get_news(
-        _ctx: &Context,
+        ctx: &Context,
         #[graphql(description = "ISO 3166-1 alpha-2 country code.")]
         _country: String,
         #[graphql(description = "Maximum number of articles sent.")]
         _limit: i32,
-    ) -> Vec<News> {
-        vec![News {
+    ) -> FieldResult<Vec<News>> {
+        let _rank = ctx.ranker.get_rank().await?;
+
+        Ok(vec![News {
             ..Default::default()
-        }]
+        }])
     }
 }

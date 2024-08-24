@@ -2,16 +2,14 @@ name: news/docker
 
 on:
   workflow_run:
-    workflows: ["news/graphql", "news/machine_learning", "codeql"]
-    types:
-      - completed
-    
+    workflows: ["news/graphql"]
+    types: ["completed"]
+
 env:
   REGISTRY: ghcr.io
 
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master' }}
     name: Publish news
     runs-on: ubuntu-latest
     permissions: write-all
@@ -32,7 +30,7 @@ jobs:
         echo PKG_VERSION=$(awk -F ' = ' '$1 ~ /version/ { gsub(/["]/, "", $2); printf("%s",$2) }' graphql/Cargo.toml) >> $GITHUB_OUTPUT
     - name: Build GraphQL image
       run: |
-            docker build . -f docker/api/Dockerfile -t ghcr.io/gravitalia/news-api:latest .
+            docker build . -f docker/api/Dockerfile -t ghcr.io/gravitalia/news-api:latest
             docker push ghcr.io/lubmminy/polymath:latest
             docker tag ghcr.io/gravitalia/news-graphql:latest ghcr.io/gravitalia/news-api:${{ steps.get-graphql-tag.outputs.PKG_VERSION }}
             docker push ghcr.io/lubmminy/polymath:${{ steps.get-graphql-tag.outputs.PKG_VERSION }}
@@ -43,7 +41,7 @@ jobs:
         echo PKG_VERSION=$(awk -F ' = ' '/^version/ { gsub(/["]/, "", $2); print $2 }' machine_learning/pyproject.toml) >> $GITHUB_OUTPUT
     - name: Build ML API image
       run: |
-            docker build . -f docker/ml/Dockerfile -t ghcr.io/gravitalia/news-ml:latest .
+            docker build . -f docker/ml/Dockerfile -t ghcr.io/gravitalia/news-ml:latest
             docker tag ghcr.io/gravitalia/news-ml:latest ghcr.io/gravitalia/news-ml:${{ steps.get-ml-tag.outputs.PKG_VERSION }}
     - name: Publish images
       run: |

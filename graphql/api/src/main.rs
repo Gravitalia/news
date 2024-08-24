@@ -15,6 +15,7 @@ use search::{Attributes, Search};
 use std::{sync::Arc, time::Duration};
 use strum::IntoEnumIterator;
 use tokio::sync::mpsc;
+use tokio::sync::RwLock;
 use tracing::{debug, error, info, Level};
 use tracing_subscriber::fmt;
 use url::Url;
@@ -120,7 +121,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     crawler.crawl()?;
 
     // Create meilisearch client.
-    let searcher = Arc::new(
+    let searcher = Arc::new(RwLock::new(
         Search::new(
             std::env::var("MEILISEARCH_URL")
                 .unwrap_or("http://localhost:7700".into()),
@@ -128,7 +129,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         )?
         .index("news".into())
         .await,
-    );
+    ));
+
+    // Add country field as a filterable attribute.
+    searcher
+        .write()
+        .await
+        .index
+        .as_ref()
+        .unwrap()
+        .set_filterable_attributes(&["source.country"])
+        .await?;
 
     // Create ranking platform.
     let ranker = Ranker::new().await?;

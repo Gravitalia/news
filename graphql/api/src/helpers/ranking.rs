@@ -31,12 +31,12 @@ impl Ranker {
     }
 
     /// Get a single ranking from multiple sources.
-    pub async fn get_rank(&self) -> Result<Vec<String>, Error> {
+    pub async fn get_rank(&self, length: u32) -> Result<Vec<String>, Error> {
         let mut result = Vec::new();
 
         if let Some(squid) = &self.squid {
             result.append(
-                &mut squid.write().await.leaderboard().await.map_err(
+                &mut squid.write().await.leaderboard(length).await.map_err(
                     |error| {
                         Error::new(
                             Unspecified,

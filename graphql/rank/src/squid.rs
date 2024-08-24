@@ -38,8 +38,11 @@ impl Squid {
     }
 
     /// Get top 10 most used words in news articles.
-    pub async fn leaderboard(&mut self) -> Result<Vec<String>, Status> {
-        let request = tonic::Request::new(LeaderboardRequest { length: 10 });
+    pub async fn leaderboard(
+        &mut self,
+        length: u32,
+    ) -> Result<Vec<String>, Status> {
+        let request = tonic::Request::new(LeaderboardRequest { length });
 
         let leaderboard = self
             .client

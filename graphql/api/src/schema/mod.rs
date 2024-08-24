@@ -8,6 +8,7 @@ use mcq::QuestionQuery;
 use news::NewsQuery;
 use search::Search;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 pub type Date = DateTime<Utc>;
 
@@ -15,7 +16,7 @@ pub type Date = DateTime<Utc>;
 #[derive(Clone, Debug)]
 pub struct Context {
     /// [`search::Search`] meilisearch client.
-    pub meilisearch: Arc<Search>,
+    pub meilisearch: Arc<RwLock<Search>>,
     /// Custom [`Ranker`] supporting multiple sources.
     pub ranker: Ranker,
 }

@@ -22,7 +22,8 @@ pub trait Attributes {
 #[derive(Clone, Debug)]
 pub struct Search {
     client: Client,
-    index: Option<Index>,
+    /// Meilisearch index.
+    pub index: Option<Index>,
     ttl_row: Option<String>,
 }
 

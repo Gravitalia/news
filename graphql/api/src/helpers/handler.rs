@@ -11,6 +11,7 @@ use chrono::Utc;
 use crawler::RssNews;
 use search::Search;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 use url::Url;
 
 #[derive(Debug, Default)]
@@ -42,7 +43,7 @@ fn find_media(from_url: &str) -> Media {
 /// Handling incoming messages from MPSC channel.
 pub async fn process_article(
     article: RssNews,
-    searcher: &Arc<Search>,
+    searcher: &Arc<RwLock<Search>>,
     ranker: &mut Ranker,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let summary = summary::get_summary(&article.content).await?;
@@ -94,7 +95,12 @@ pub async fn process_article(
 
         ranker.add_entry(&news.title).await?;
 
-        searcher.add_entry(news).await.map_err(|e| e.into())
+        searcher
+            .read()
+            .await
+            .add_entry(news)
+            .await
+            .map_err(|e| e.into())
     } else {
         Err("No media found with this URL".into())
     }

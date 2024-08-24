@@ -2,7 +2,7 @@ name: news/docker
 
 on:
   workflow_run:
-    workflows: ["news/graphql", "news/machine_learning", "codeql/python"]
+    workflows: ["news/graphql", "news/machine_learning", "codeql"]
     types:
       - completed
     

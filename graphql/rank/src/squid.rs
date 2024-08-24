@@ -12,6 +12,7 @@ mod squid {
 }
 
 /// Squid client structure.
+#[derive(Clone, Debug)]
 pub struct Squid {
     client: SquidClient<Channel>,
 }

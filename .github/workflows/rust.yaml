@@ -1,0 +1,26 @@
+name: news/graphql
+
+on: [push, pull_request]
+
+jobs:
+  graphql:
+    name: cargo build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Cache Cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+      - name: Initialize Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Test GraphQL API
+        run: cargo test --all-features
+      - name: Clippy
+        run: cargo clippy

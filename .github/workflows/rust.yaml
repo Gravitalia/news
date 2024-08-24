@@ -21,6 +21,8 @@ jobs:
       - name: Initialize Rust toolchain
         uses: dtolnay/rust-toolchain@stable
       - name: Test GraphQL API
+        working-directory: /graphql
         run: cargo test --all-features
       - name: Clippy
+        working-directory: /graphql
         run: cargo clippy

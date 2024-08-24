@@ -31,9 +31,7 @@ jobs:
     - name: Build GraphQL image
       run: |
             docker build . -f docker/api/Dockerfile -t ghcr.io/gravitalia/news-api:latest
-            docker push ghcr.io/lubmminy/polymath:latest
             docker tag ghcr.io/gravitalia/news-graphql:latest ghcr.io/gravitalia/news-api:${{ steps.get-graphql-tag.outputs.PKG_VERSION }}
-            docker push ghcr.io/lubmminy/polymath:${{ steps.get-graphql-tag.outputs.PKG_VERSION }}
     - name: Get ML tag
       id: "get-ml-tag"
       shell: "bash"

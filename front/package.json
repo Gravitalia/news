@@ -16,7 +16,7 @@
   "dependencies": {
     "@nuxt/eslint": "^0.3.13",
     "@nuxt/image": "^1.7.0",
-    "nuxt": "^3.16.0",
+    "nuxt": "^3.19.0",
     "vue": "^3.4.29",
     "vue-router": "^4.3.3"
   },

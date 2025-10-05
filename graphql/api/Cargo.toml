@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-warp = "0.3"
-juniper = { version = "0.16", features = ["chrono"] }
-tokio = { version = "1.38", features = ["macros", "rt-multi-thread"] }
-juniper_warp = "0.8"
+warp = { version = "0.4", features = ["server"] }
+juniper = { version = "0.17", features = ["chrono"] }
+tokio = { workspace = true }
+juniper_warp = "0.9"
 serde = { version = "1", features = ["derive"] }
 tracing = "0.1"
 tracing-subscriber = "0.3"
@@ -15,9 +15,9 @@ crawler = { path = "../crawler" }
 search = { path = "../search" }
 rank = { path = "../rank" }
 error = { path = "../error" }
-strum = "0.26"
-strum_macros = "0.26"
-url = "2.*"
+strum = "0.27"
+strum_macros = "0.27"
+url = "2"
 r2d2-memcache = "0.6"
 reqwest = { version = "0.12", features = ["json"] }
 chrono = { version = "0.4", features = ["serde"] }

@@ -2,11 +2,12 @@
 
 use squid::squid_client::SquidClient;
 use squid::{AddRequest, LeaderboardRequest};
-use tonic::transport::{Channel, Error};
 use tonic::Status;
+use tonic::transport::{Channel, Error};
 
 const DAY_IN_SECONDS: u64 = 86400;
 
+#[allow(clippy::module_inception)]
 mod squid {
     tonic::include_proto!("squid");
 }

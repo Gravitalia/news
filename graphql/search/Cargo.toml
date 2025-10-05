@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 chrono = "0.4"
 error = { path = "../error" }
-meilisearch-sdk = "0.26"
+meilisearch-sdk = "0.30"
 serde = { version = "1", features = ["derive"] }
-tokio = { version = "1.38", features = ["rt-multi-thread"] }
+tokio = { workspace = true }
 tracing = "0.1"

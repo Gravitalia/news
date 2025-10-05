@@ -1,5 +1,5 @@
 use juniper::{GraphQLEnum, GraphQLObject};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, GraphQLEnum, Serialize, Deserialize)]
 pub enum Scheme {

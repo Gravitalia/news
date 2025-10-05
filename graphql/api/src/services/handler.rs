@@ -1,5 +1,11 @@
-use crate::helpers::ranking::Ranker;
-use crate::helpers::summary;
+use chrono::Utc;
+use crawler::RssNews;
+use error::BError;
+use search::Search;
+use std::sync::Arc;
+use tokio::sync::RwLock;
+use url::Url;
+
 use crate::media::fr::French;
 use crate::media::us::UnitedStates;
 use crate::models::{
@@ -7,12 +13,8 @@ use crate::models::{
     news::News,
     source::Media as Source,
 };
-use chrono::Utc;
-use crawler::RssNews;
-use search::Search;
-use std::sync::Arc;
-use tokio::sync::RwLock;
-use url::Url;
+use crate::services::ranking::Ranker;
+use crate::services::summary::Sum;
 
 #[derive(Debug, Default)]
 struct Media {
@@ -43,10 +45,11 @@ fn find_media(from_url: &str) -> Media {
 /// Handling incoming messages from MPSC channel.
 pub async fn process_article(
     article: RssNews,
+    summary: &Sum,
     searcher: &Arc<RwLock<Search>>,
     ranker: &mut Ranker,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let summary = summary::get_summary(&article.content).await?;
+) -> Result<(), BError> {
+    let summary = summary.sum(&article.content).await?;
 
     let image = if let Some(img) = article.image {
         let url = Url::parse(&img)?;

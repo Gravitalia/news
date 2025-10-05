@@ -11,7 +11,7 @@ license.workspace = true
 tonic = "0.12.1"
 prost = "0.13"
 reqwest = "0.12"
-lazy_static = "1.5.0"
+lazy_static = "1.5"
 
 [build-dependencies]
 tonic-build = { version = "0.12.1", features = ["prost"] }

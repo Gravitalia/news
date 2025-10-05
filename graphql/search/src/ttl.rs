@@ -6,9 +6,9 @@ use chrono::Local;
 use meilisearch_sdk::{documents::DocumentDeletionQuery, indexes::Index};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tokio::task;
-use tracing::{error, info};
+
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 #[derive(Deserialize, Serialize)]
 struct MyDocumentType {}
@@ -28,9 +28,9 @@ pub fn cron_job(index: Arc<Index>, row_name: Arc<String>) {
                         % 86400),
             ));
 
-            info!("cron job started to delete expired news article.");
+            tracing::debug!("cron job started to delete expired news articles");
 
-            if DocumentDeletionQuery::new(&index)
+            match DocumentDeletionQuery::new(&index)
                 .with_filter(&format!(
                     "{}={}",
                     row_name,
@@ -38,9 +38,13 @@ pub fn cron_job(index: Arc<Index>, row_name: Arc<String>) {
                 ))
                 .execute::<MyDocumentType>()
                 .await
-                .is_err()
             {
-                error!("Failed to delete expired news article.")
+                Ok(info) => {
+                    tracing::info!(?info, "deleted expired news articles")
+                },
+                Err(err) => {
+                    tracing::error!(%err, "failed to delete expired news articles")
+                },
             };
         }
     });

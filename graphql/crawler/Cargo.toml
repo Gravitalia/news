@@ -9,10 +9,10 @@ polymath-cache = { git = "https://github.com/Lubmminy/polymath" }
 polymath-crawler = { git = "https://github.com/Lubmminy/polymath" }
 error = { path = "../error" }
 reqwest = "0.12"
-rss = "2.*"
+rss = "2.0"
 r2d2 = "0.8"
 r2d2-memcache = "0.6"
-tokio = { version = "1.38", features = ["rt-multi-thread"] }
+tokio = { workspace = true }
 tracing = "0.1"
 scraper = "0.19"
 url = "2.*"

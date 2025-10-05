@@ -77,7 +77,7 @@ impl fmt::Display for ErrorType {
             ErrorType::Unspecified => {
                 write!(f, "An unspecified error occurred.")
             },
-            ErrorType::Database(ref error) => {
+            ErrorType::Database(error) => {
                 write!(f, "{}", error)
             },
         }

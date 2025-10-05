@@ -1,17 +1,15 @@
 #![forbid(unsafe_code)]
-#![deny(dead_code, unused_imports, unused_mut, missing_docs)]
+#![deny(unused_imports, unused_mut, missing_docs)]
 //! GraphQL API.
 
-mod helpers;
 mod media;
 mod models;
 mod schema;
+mod services;
 
-use crate::models::news::News;
-use crate::schema::*;
 use crawler::{cache::Cache, Crawler};
-use helpers::ranking::Ranker;
 use search::{Attributes, Search};
+use services::ranking::Ranker;
 use std::{sync::Arc, time::Duration};
 use strum::IntoEnumIterator;
 use tokio::sync::mpsc;
@@ -20,6 +18,10 @@ use tracing::{debug, error, info, Level};
 use tracing_subscriber::fmt;
 use url::Url;
 use warp::Filter;
+
+use crate::models::news::News;
+use crate::schema::*;
+use crate::services::summary::Sum;
 
 const DEFAULT_PORT: u16 = 5400;
 const LRU_CAPACITY: usize = 100;
@@ -44,7 +46,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let pool = r2d2_memcache::r2d2::Pool::builder()
             .max_size(15)
             .build(manager)?;
-        info!("Created a Memcached pool.");
+        info!("created memcached pool");
         Cache::new(LRU_CAPACITY).memcached(pool)
     } else {
         Cache::new(LRU_CAPACITY)
@@ -70,7 +72,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
         {
             debug!(
-                "Add {:?} method extractor for {}.",
+                "add {:?} method extractor for {}",
                 variant.extractor(),
                 host
             );
@@ -99,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             })
         {
             debug!(
-                "Add {:?} method extractor for {}.",
+                "add {:?} method extractor for {}",
                 variant.extractor(),
                 host
             );
@@ -143,6 +145,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Create ranking platform.
     let ranker = Ranker::new().await?;
+    // Create summary platform.
+    let sum = Sum::new(
+        std::env::var("SUMMARY_URL")
+            .unwrap_or("http://localhost:8000".to_string()),
+    )?;
 
     // Create a filter for the main GraphQL endpoint.
     let ctx_ranker = ranker.clone();
@@ -156,14 +163,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create receiver of crawled articles.
     tokio::spawn(async move {
         while let Some(i) = rx.recv().await {
-            if let Err(e) = crate::helpers::handler::process_article(
+            if let Err(err) = crate::services::handler::process_article(
                 i,
+                &sum,
                 &searcher,
                 &mut ranker.clone(),
             )
             .await
             {
-                error!("Failed to process article: {}", e);
+                error!(%err, "failed to process article");
             }
         }
     });

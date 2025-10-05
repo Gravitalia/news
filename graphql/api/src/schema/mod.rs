@@ -1,7 +1,7 @@
 mod mcq;
 mod news;
 
-use crate::helpers::ranking::Ranker;
+use crate::services::ranking::Ranker;
 use chrono::{DateTime, Utc};
 use juniper::{EmptyMutation, EmptySubscription, RootNode};
 use mcq::QuestionQuery;
@@ -40,12 +40,8 @@ impl Query {
 }
 
 /// Define the schema using RootNode.
-type Schema = RootNode<
-    'static,
-    Query,
-    EmptyMutation<Context>,
-    EmptySubscription<Context>,
->;
+type Schema =
+    RootNode<Query, EmptyMutation<Context>, EmptySubscription<Context>>;
 
 /// Create the schema instance.
 pub fn schema() -> Schema {

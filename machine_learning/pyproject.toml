@@ -10,9 +10,10 @@ readme = "README.md"
 license = { file = "LICENSE" }
 dependencies = [
     "fastapi",
+    "uvicorn",
     "sentencepiece==0.2.0",
     "tensorflow>2.16",
-    "tf-keras>=2.17",
+    #"tf-keras>=2.17",
     "transformers>4.43",
     "torch>=2.4.0",
 ]

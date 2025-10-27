@@ -16,10 +16,8 @@ services:
       dockerfile: ./docker/ml/Dockerfile
     container_name: machine_learning
     restart: always
-    environment:
-      - PORT=8000
     ports:
-      - 8000:8000
+      - 9001:9001
 
   meilisearch:
     container_name: meilisearch

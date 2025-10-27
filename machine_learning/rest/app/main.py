@@ -14,12 +14,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # Handle prefetch request.
 @app.options("/")
 def read_root():
     return "OK"
-
 
 @app.get("/summary/", status_code=200)
 def read_sum(text: str, response: Response):
@@ -35,7 +33,6 @@ def read_sum(text: str, response: Response):
     Question & answers model HTTP API.
     Generates one question and three answers (one true, two false) based on a text.
     """
-    response.status_code = status.HTTP_201_CREATED
     return JSONResponse(
         status_code=200,
         content={
